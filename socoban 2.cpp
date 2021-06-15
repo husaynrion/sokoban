@@ -41,7 +41,7 @@ int main()
 	{
 		for (int j = 0; j < sizy; j++)
 		{
-			if (a[i][j] == 'O')
+			if ((a[i][j] == 'O')||(a[i][j] == 'S'))
 			{
 				goalX[cGoal] = i;
 				goalY[cGoal] = j;
