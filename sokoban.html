@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+  <meta name="" content="">
+  <title>Sokoban</title>
+</head>
+<body>
+  <style type="text/css" media="all">
+    * {
+      padding: 0;
+      margin: 0;
+    }
+    .btn {
+      height: 120px;
+      width: 120px;
+      display: inline;
+      background-color: red;
+    }
+    .btn:hover {
+      background-color: blue;
+    }
+    button {
+      font-size: 50px;
+      color: #fff;
+    }
+    .row {
+      display: flex;
+    }
+    .sq {
+      display: inline;
+    }
+    #blocks {
+      height: 120px;
+      display: flex;
+      margin: 20px;
+    }
+    #blocks .bluebtn {
+      height: 120px;
+      width: 118px;
+      background-color: grey;
+    }
+  </style>
+
+  <div class="sq" id="sq">
+
+  </div>
+  <div style="display:flex;">
+    <button type="submit" style="padding:30px;margin:10px;background-color:gold;" onclick="result()">Submit</button>
+
+
+    <div id="blocks">
+      <button id="bB#" class="bluebtn" onclick="change('#')">#</button>
+      <button id="bBO" class="bluebtn" onclick="change('O')">O</button>
+      <button id="bBA" class="bluebtn" onclick="change('A')">A</button>
+      <button id="bB$" class="bluebtn" onclick="change('$')">$</button>
+      <button id="bBS" class="bluebtn" onclick="change('S')">S</button>
+      <button id="bB " class="bluebtn" onclick="change(' ')"> </button>
+    </div>
+
+  </div>
+  <br>
+  <textarea name="result" id="result" rows="4" cols="54" style="font-size:30px;"></textarea>
+
+
+  <script type="text/javascript" charset="utf-8">
+
+    var sq = document.getElementById("sq");
+    for (var i = 0; i < 9; i++) {
+      var rowName = "row"+i;
+      var row = document.createElement("DIV");
+      sq.appendChild(row);
+      row.setAttribute("id", rowName);
+      row.setAttribute("class", "row");
+      for (var j = 0; j < 9; j++) {
+        var btn = document.createElement("BUTTON");
+        btn.innerHTML = " ";
+        row.appendChild(btn);
+        btn.setAttribute("id", "btn"+i+j);
+        btn.setAttribute("class", "btn");
+        btn.setAttribute("onclick", "sqClick("+i+","+j+")");
+      }
+    }
+
+    var prek = "#";
+    function change(k) {
+      document.getElementById("bB"+k).style.backgroundColor = "#0000ff";
+      if (prek != k) {
+        document.getElementById("bB"+prek).style.backgroundColor = "grey";
+      }
+      prek = k;
+    }
+
+    function sqClick(a, b) {
+      var but = document.getElementById("btn"+a+b);
+      but.innerHTML = prek;
+    }
+    function result() {
+      var char = "{";
+      for (var i = 0; i < 9; i++) {
+        char += "\"";
+        for (var j = 0; j < 9; j++) {
+          var num = 8-j;
+          char += document.getElementById("btn"+num+i).innerHTML;
+        }
+        char += "\"";
+        if (i < 8) {
+          char += ",";
+        }
+      }
+      char += "};";
+      document.getElementById("result").innerHTML = char;
+    }
+  </script>
+</body>
+</html>
