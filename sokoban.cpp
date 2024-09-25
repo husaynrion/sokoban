@@ -289,8 +289,8 @@ int main()
 		for (int i = 0; i < wallCount; i++)
 		{
 			if ( ( wall[i].x == testBox.x && wall[i].y == testBox.y )
-                && /* Worker is trying to push the box */
-                ( testWorker.x == box[boxNumber].x && testWorker.y == box[boxNumber].y ) )
+	                && /* Worker is trying to push the box */
+	                ( testWorker.x == box[boxNumber].x && testWorker.y == box[boxNumber].y ) )
 			{
 				boxHitsWall = 1;
 			}
@@ -301,8 +301,8 @@ int main()
 		for (int i = 0; i < boxCount; i++)
 		{
 			if ( ( box[i].x == testBox.x && box[i].y == testBox.y )
-                && /* Worker is trying to push the box */
-                ((testWorker.x == box[boxNumber].x) && (testWorker.y == box[boxNumber].y)))
+	                && /* Worker is trying to push the box */
+	                ((testWorker.x == box[boxNumber].x) && (testWorker.y == box[boxNumber].y)))
 			{
 				boxHitsBox = 1;
 			}
