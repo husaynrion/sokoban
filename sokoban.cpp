@@ -52,58 +52,74 @@ void textcolor (int color)
 }
 // Define textcolor function END
 
+
+struct position {
+    int x;
+    int y;
+
+    int lastX;
+    int lastY;
+};
+
 int main()
 {
-	char a[9][10] =
+	char cell[9][10] =
     // Paste the Maze Pattern in the below line
         {" ####    "," #  ###  "," #  $ ## "," #  $  # "," ## ##A# "," # OO# # "," #     # "," ####### ","         "};
-	int sizx = 9;
-	int sizy = 9;
-	int x, y, gameOn = 1, oldX, oldY, newBoxX, newBoxY, testX, testY, cWall = 0, cGoal = 0, hitsWall, boxWall, boxBox, boxGoal, hitsBox;
-	for (int i = 0; i < sizx; i++)
+
+	int _size = 9;
+
+	struct position worker;
+	// Finding position of the worker
+	for (int x = 0; x < _size; x++)
 	{
-		for (int j = 0; j < sizy; j++)
+		for (int y = 0; y < _size; y++)
 		{
-			if (a[i][j] == 'A')
+			if (cell[x][y] == 'A')
 			{
-				x = i;
-				y = j;
+				worker.x = x;
+				worker.y = y;
 			}
 		}
 	}
 
-	int wallX[sizx * sizy];
-	int wallY[sizx * sizy];
-	int goalX[sizx];
-	int goalY[sizy];
-	for (int i = 0; i < sizx; i++)
+	struct position wall[_size * _size];
+	int wallCount = 0;
+
+	struct position goal[_size * _size];
+	int goalCount = 0;
+
+	for (int x = 0; x < _size; x++)
 	{
-		for (int j = 0; j < sizy; j++)
+		for (int y = 0; y < _size; y++)
 		{
-			if (a[i][j] == '#')
+			if (cell[x][y] == '#')
 			{
-				wallX[cWall] = i;
-				wallY[cWall] = j;
-				cWall++;
-			}
-		}
-	}
-	for (int i = 0; i < sizx; i++)
-	{
-		for (int j = 0; j < sizy; j++)
-		{
-			if ((a[i][j] == 'O') || (a[i][j] == 'S'))
-			{
-				goalX[cGoal] = i;
-				goalY[cGoal] = j;
-				cGoal++;
+				wall[wallCount].x = x;
+				wall[wallCount].y = y;
+				wallCount++;
 			}
 		}
 	}
 
+
+	for (int x = 0; x < _size; x++)
+	{
+		for (int y = 0; y < _size; y++)
+		{
+			if ((cell[x][y] == 'O') || (cell[x][y] == 'S'))
+			{
+				goal[goalCount].x = x;
+				goal[goalCount].y = y;
+				goalCount++;
+			}
+		}
+	}
+
+	int  gameOn = 1;
 	while (gameOn == 1)
 	{
-		printf("A = Man,\n");
+		printf("A = Worker,\n");
 		printf("$ = Box,\n");
 		printf("O = Goal,\n");
 		printf("# = Wall.\n");
@@ -111,217 +127,232 @@ int main()
 
 		//edit
 		printf("+-----------------------------------+\n");
-		for (int j = 8; j >= 0; j--)
+		for (int y = 8; y >= 0; y--)
 		{
-			for (int i = 0; i <= 8; i++)
+			for (int x = 0; x <= 8; x++)
 			{
 				textcolor(WHITE);
 				printf("|");
-				if (a[i][j] == 'S')
+				if (cell[x][y] == 'S')
 				{
-					textcolor(GREEN);
+					textcolor(LIGHTGREEN);
 				}
-				else if (a[i][j] == '#')
+				else if (cell[x][y] == '#')
 				{
-					textcolor(BLUE);
+					textcolor(LIGHTBLUE);
 				}
-				else if (a[i][j] == '$')
+				else if (cell[x][y] == '$')
 				{
 					textcolor(YELLOW);
 				}
-				else if ((a[i][j]== 'A') || (a[i][j]== 'p'))
+				else if ((cell[x][y]== 'A') || (cell[x][y]== 'p'))
 				{
-					textcolor(RED);
+					textcolor(LIGHTRED);
 				}
 				else
 				{
 					textcolor(WHITE);
 				}
-				printf(" %c ", a[i][j]);
+				printf(" %c ", cell[x][y]);
 			}
 			textcolor(WHITE);
 			printf("|\n");
-			if (j != 0)
+			if (y != 0)
 			{
 				printf("|-----------------------------------|\n");
 			}
 		}
 		printf("+-----------------------------------+\n");
 		//edit
-		oldX = x;
-		oldY = y;
+		worker.lastX = worker.x;
+		worker.lastY  = worker.y;
 
 		/*where is B*/
-		int cBox = 0;
-		int boxX[sizy];
-		int boxY[sizy];
-		for (int i = 0; i < sizx; i++)
+		struct position box[_size * _size];
+		int boxCount = 0;
+
+		for (int x = 0; x < _size; x++)
 		{
-			for (int j = 0; j < sizy; j++)
+			for (int y = 0; y < _size; y++)
 			{
-				if ((a[i][j] == '$') || (a[i][j] == 'S'))
+				if ((cell[x][y] == '$') || (cell[x][y] == 'S'))
 				{
-					boxX[cBox] = i;
-					boxY[cBox] = j;
-					cBox++;
+					box[boxCount].x = x;
+					box[boxCount].y = y;
+					boxCount++;
 				}
 			}
 		}
 
-		boxGoal = 0;
-		for (int i = 0; i < cGoal; i++)
+		bool allBoxInsideGoal = 1;
+
+		for (int i = 0; i < goalCount; i++)
 		{
-			if (a[goalX[i]][goalY[i]] != 'S')
-			{
-				boxGoal = 1;
-			}
+            if (cell[goal[i].x][goal[i].y] != 'S')
+            {
+                allBoxInsideGoal = 0;
+            }
 		}
-		if (boxGoal == 0)
+
+		if (allBoxInsideGoal == 1)
 		{
-			printf(".\n");
 			printf(".\n");
 			printf(".\n");
 			printf(".\n");
 			printf("You Win...!congrats.");
 			printf(".\n");
 			printf(".\n");
-			printf(".\n");
-			printf(".\n");
 			break;
 		}
 		char key = getch();
 
-        if(key == 'o'){
+        if(key == 'q'){
             break;
         }
 		system("cls");
+
+
+        struct position testWorker;
+
 		switch (key)
 		{
-		case 'w':
-			testY = y + 1;
-			testX = x;
+		case 'H':
+			testWorker.y = worker.y + 1;
+			testWorker.x = worker.x;
 			break;
-		case 's':
-			testY = y - 1;
-			testX = x;
+		case 'P':
+			testWorker.y = worker.y - 1;
+			testWorker.x = worker.x;
 			break;
-		case 'd':
-			testX = x + 1;
-			testY = y;
+		case 'M':
+			testWorker.x = worker.x + 1;
+			testWorker.y = worker.y;
 			break;
-		case 'a':
-			testX = x - 1;
-			testY = y;
+		case 'K':
+			testWorker.x = worker.x - 1;
+			testWorker.y = worker.y;
 			break;
 		}
-		hitsBox = 0;
-		int oldBoxX, oldBoxY;
-		int testBoxX, testBoxY;
-		for (int i = 0; i < cBox; i++)
+
+		bool workerPushesBox = 0;
+
+		struct position testBox;
+
+		int boxNumber;
+
+		for (int i = 0; i < boxCount; i++)
 		{
-			if ((testX == boxX[i]) && (testY == boxY[i]))
+			if ((testWorker.x == box[i].x) && (testWorker.y == box[i].y))
 			{
-				oldBoxX = boxX[i];
-				oldBoxY = boxY[i];
-				hitsBox = 1;
-			}
-		}
-		if (hitsBox == 1)
-		{
-			switch (key)
-			{
-			case 'w':
-				testBoxY = oldBoxY + (oldBoxY - oldY);
-				testBoxX = oldBoxX;
-				break;
-			case 's':
-				testBoxY = oldBoxY + (oldBoxY - oldY);
-				testBoxX = oldBoxX;
-				break;
-			case 'd':
-				testBoxX = oldBoxX + (oldBoxX - oldX);
-				testBoxY = oldBoxY;
-				break;
-			case 'a':
-				testBoxX = oldBoxX + (oldBoxX - oldX);
-				testBoxY = oldBoxY;
-				break;
-			}
-		}
-		hitsWall = 0;
-		for (int i = 0; i < cWall; i++)
-		{
-			if ((wallX[i] == testX) && (wallY[i] == testY))
-			{
-				hitsWall = 1;
-			}
-		}
-		boxWall = 0;
-		for (int i = 0; i < cWall; i++)
-		{
-			if (((wallX[i] == testBoxX) && (wallY[i] == testBoxY)) && ((testX == oldBoxX) && (testY == oldBoxY)))
-			{
-				boxWall = 1;
-			}
-		}
-		boxBox = 0;
-		for (int i = 0; i < cBox; i++)
-		{
-			if (((boxX[i] == testBoxX) && (boxY[i] == testBoxY)) && ((testX == oldBoxX) && (testY == oldBoxY)))
-			{
-				boxBox = 1;
+				box[i].lastX = box[i].x;
+				box[i].lastY = box[i].y;
+				boxNumber = i;
+				workerPushesBox = 1;
 			}
 		}
 
-		if ((hitsWall == 1) || (boxWall == 1) || (boxBox == 1))
+		if (workerPushesBox == 1)
 		{
-			printf("Ouch...!\n");
-		}
-		else
-		{
-			printf("Carry on...\n");
 			switch (key)
 			{
-			case 'w':
-				y += 1;
+			case 'H':
+				testBox.y = box[boxNumber].y + 1;
+				testBox.x = box[boxNumber].x;
 				break;
-			case 's':
-				y -= 1;
+			case 'P':
+				testBox.y = box[boxNumber].y - 1;
+				testBox.x = box[boxNumber].x;
 				break;
-			case 'd':
-				x += 1;
+			case 'M':
+				testBox.x = box[boxNumber].x + 1;
+				testBox.y = box[boxNumber].y;
 				break;
-			case 'a':
-				x -= 1;
+			case 'K':
+				testBox.x = box[boxNumber].x - 1;
+				testBox.y = box[boxNumber].y;
 				break;
 			}
-			a[x][y] += 33;
-			if ((x == oldBoxX) && (y == oldBoxY))
+		}
+
+		bool workerHitsWall = 0;
+
+		for (int i = 0; i < wallCount; i++)
+		{
+			if ((wall[i].x == testWorker.x) && (wall[i].y == testWorker.y))
 			{
-				newBoxX = oldBoxX;
-				newBoxY = oldBoxY;
+				workerHitsWall = 1;
+			}
+		}
+
+		bool boxHitsWall = 0;
+
+		for (int i = 0; i < wallCount; i++)
+		{
+			if ( ( wall[i].x == testBox.x && wall[i].y == testBox.y )
+                && /* Worker is trying to push the box */
+                ( testWorker.x == box[boxNumber].x && testWorker.y == box[boxNumber].y ) )
+			{
+				boxHitsWall = 1;
+			}
+		}
+
+		bool boxHitsBox = 0;
+
+		for (int i = 0; i < boxCount; i++)
+		{
+			if ( ( box[i].x == testBox.x && box[i].y == testBox.y )
+                && /* Worker is trying to push the box */
+                ((testWorker.x == box[boxNumber].x) && (testWorker.y == box[boxNumber].y)))
+			{
+				boxHitsBox = 1;
+			}
+		}
+
+		if ( (workerHitsWall == 0) && (boxHitsWall == 0) && (boxHitsBox == 0 ) )
+		{
+
+			switch (key)
+			{
+			case 'H':
+				worker.y += 1;
+				break;
+			case 'P':
+				worker.y -= 1;
+				break;
+			case 'M':
+				worker.x += 1;
+				break;
+			case 'K':
+				worker.x -= 1;
+				break;
+			}
+
+			cell[worker.x][worker.y] += 33;
+
+			if ((worker.x == box[boxNumber].x) && (worker.y == box[boxNumber].y))
+			{
 				switch (key)
 				{
-				case 'w':
-					oldBoxY = oldBoxY + (oldBoxY - oldY);
+				case 'H':
+					box[boxNumber].y = box[boxNumber].y + 1;
 					break;
-				case 's':
-					oldBoxY = oldBoxY + (oldBoxY - oldY);
+				case 'P':
+					box[boxNumber].y = box[boxNumber].y - 1;
 					break;
-				case 'd':
-					oldBoxX = oldBoxX + (oldBoxX - oldX);
+				case 'M':
+					box[boxNumber].x = box[boxNumber].x + 1;
 					break;
-				case 'a':
-					oldBoxX = oldBoxX + (oldBoxX - oldX);
+				case 'K':
+					box[boxNumber].x = box[boxNumber].x - 1;
 					break;
 				}
-				a[oldBoxX][oldBoxY] += 4;
-				a[newBoxX][newBoxY] -= 4;
+				cell[box[boxNumber].x][box[boxNumber].y] += 4;
+				cell[box[boxNumber].lastX][box[boxNumber].lastY] -= 4;
 			}
-			a[oldX][oldY] -= 33;
+			cell[worker.lastX][worker.lastY] -= 33;
 		}
 
-		if (key == 'l')
+		if (key == 'q')
 		{
 			gameOn = 0;
 		}
